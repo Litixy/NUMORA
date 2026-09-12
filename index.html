@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f7f6f3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="NUMORA">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-180.png">
 <title>NUMORA — Numbers Challenge</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3QgeD0iNCIgeT0iNCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjU2IiByeD0iMTgiIGZpbGw9IiNmZmZhZjYiIHN0cm9rZT0iI2VhZDJjNSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHJlY3QgeD0iMTYiIHk9IjE3IiB3aWR0aD0iMTQiIGhlaWdodD0iMTAiIHJ4PSI1IiBmaWxsPSIjZGY5MzZmIi8+PHJlY3QgeD0iMzQiIHk9IjE3IiB3aWR0aD0iMTQiIGhlaWdodD0iMTAiIHJ4PSI1IiBmaWxsPSIjZThiNTlmIi8+PHJlY3QgeD0iMTYiIHk9IjMxIiB3aWR0aD0iMjAiIGhlaWdodD0iMTAiIHJ4PSI1IiBmaWxsPSIjZDdiMjhmIi8+PHJlY3QgeD0iNDAiIHk9IjMxIiB3aWR0aD0iOCIgaGVpZ2h0PSIxMCIgcng9IjQiIGZpbGw9IiNhOWJjYWUiLz48cmVjdCB4PSIxNiIgeT0iNDUiIHdpZHRoPSIzMiIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iIzJiMjkyZCIgb3BhY2l0eT0iLjgyIi8+PC9zdmc+">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -918,6 +924,15 @@ footer{display:flex;justify-content:center;gap:18px;margin-top:14px;color:var(--
   });
 
 })();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(err => {
+      console.warn("Service Worker registration failed:", err);
+    });
+  });
+}
 </script>
 </body>
 </html>
