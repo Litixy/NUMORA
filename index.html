@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NUMORA — Numbers Challenge</title>
+<link rel="icon" type="image/svg+xml" href="numora-logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f6f3;
+  --surface:#ffffff;
+  --surface-soft:#fbfaf8;
+  --ink:#27252a;
+  --muted:#77727a;
+  --faint:#a8a2aa;
+  --line:#ebe7e3;
+  --warm:#df936f;
+  --warm-deep:#bf6f4d;
+  --warm-soft:#fff3ec;
+  --warm-line:#ead2c5;
+  --sage:#739a86;
+  --sage-soft:#eef6f1;
+  --danger:#d86d77;
+  --danger-soft:#fff0f2;
+  --shadow:0 14px 34px rgba(45,38,40,.065);
+  --shadow-soft:0 5px 16px rgba(45,38,40,.045);
+  --r-xl:28px;
+  --r-lg:20px;
+  --r-md:15px;
+  --r-sm:12px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;min-height:100%;background:var(--bg)}
+body{font-family:'Zen Maru Gothic',system-ui,sans-serif;color:var(--ink);padding:0 18px 34px;overflow-x:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button,input{font:inherit}
+.page{width:100%;max-width:820px;margin:0 auto}
+.site-header{padding:10px 0 20px}
+.brandbar{height:58px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-logo-img{width:38px;height:38px;display:block}
+.brand-copy{display:flex;flex-direction:column;line-height:1}
+.brand-copy strong{font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;letter-spacing:.16em}
+.brand-copy span{margin-top:5px;font-family:'Nunito',sans-serif;font-size:7px;font-weight:800;letter-spacing:.23em;color:var(--faint)}
+.brand-tag{font-family:'Nunito',sans-serif;font-size:9px;font-weight:800;letter-spacing:.13em;color:var(--faint)}
+.hero-copy{padding:28px 4px 16px}
+.eyebrow{margin:0 0 8px;font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;letter-spacing:.14em;color:var(--warm-deep)}
+.hero-copy h1{margin:0;font-size:clamp(30px,6vw,45px);font-weight:900;letter-spacing:-.045em;line-height:1.08}
+.hero-copy>p:last-child{margin:10px 0 0;font-size:13px;line-height:1.75;color:var(--muted)}
+.app-shell{position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-xl);box-shadow:var(--shadow)}
+.content{padding:28px;min-height:420px}
+.screen{display:none}
+.screen.active{display:block;animation:screenEnter .22s cubic-bezier(.22,.7,.2,1) both}
+/* home */
+.mode-card{position:relative;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;width:100%;min-height:112px;margin:0 0 12px;padding:18px 18px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-soft);cursor:pointer;color:inherit;text-align:left;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,background .16s ease}
+.mode-card::after{content:"↗";position:absolute;right:18px;top:50%;margin-top:-11px;color:#b4adb0;font-family:'Nunito',sans-serif;font-size:18px;font-weight:700;transition:transform .16s ease,color .16s ease}
+.mode-card:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(45,38,40,.07);border-color:#e3d9d4}
+.mode-card:hover::after{transform:translate(2px,-2px);color:var(--warm-deep)}
+.mode-card:active{transform:translateY(0) scale(.995)}
+.mode-card:focus-visible{outline:none;box-shadow:0 0 0 4px rgba(223,147,111,.13),var(--shadow-soft)}
+.mode-glyph{position:relative;grid-column:1;grid-row:1;z-index:1;width:58px;height:58px;display:grid;place-items:center;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#fffdfa,#faf8f5);color:var(--warm-deep);overflow:hidden}
+.mode-glyph-calc{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);padding:8px;gap:4px;font-family:'Nunito','Zen Maru Gothic',sans-serif}
+.mode-glyph-calc span{display:grid;place-items:center;width:100%;height:100%;border-radius:10px;background:#fff;border:1px solid #eee8e3;font-size:15px;font-weight:800;line-height:1}
+.mode-glyph-factor{display:flex;align-items:center;justify-content:center;gap:3px;font-family:'Nunito','Zen Maru Gothic',sans-serif}
+.mode-glyph-factor span{font-size:17px;font-weight:900;line-height:1}
+.mode-glyph-factor i{font-style:normal;color:#c9b7aa;font-size:12px;font-weight:800}
+.mode-title{grid-column:2;grid-row:1;margin:0 0 3px;font-size:18px;font-weight:900;letter-spacing:-.025em}
+.mode-desc{grid-column:2;grid-row:1;align-self:end;margin:27px 0 0;color:var(--muted);font-size:12px;line-height:1.6}
+/* settings */
+.settings-header{display:flex;align-items:center;gap:12px;margin-bottom:8px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.back-btn,.quit-btn{border:1px solid var(--line);background:#fff;border-radius:999px;color:var(--muted);padding:8px 13px;cursor:pointer;font-weight:700;font-size:12px;transition:transform .13s ease,border-color .13s ease,background .13s ease,color .13s ease}
+.back-btn:hover,.quit-btn:hover{transform:translateY(-1px);background:var(--surface-soft);border-color:#ded7d2;color:var(--ink)}
+.back-btn:active,.quit-btn:active{transform:translateY(0)}
+.settings-header h2{margin:0;font-size:19px;font-weight:900}
+.field-row{padding:17px 0;border-bottom:1px solid #f1eeeb}
+.field-row:last-of-type{border-bottom:0}
+.field-label{display:block;margin-bottom:9px;font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--faint)}
+.fixed-info-row{padding:14px 16px;background:linear-gradient(180deg,#fffdf9,#fff9f1);border:1px solid var(--line);border-radius:18px}
+.fixed-stats{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;color:var(--ink);font-size:14px}
+.fixed-stat b{font-size:21px;font-weight:900;letter-spacing:-.02em}
+.fixed-dot{color:#c6b7a5}
+.fixed-note{color:var(--muted);font-size:11.5px}
+
+.chip-row{display:flex;gap:8px;flex-wrap:wrap}
+.chip{min-width:46px;min-height:42px;padding:8px 14px;border-radius:13px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer;font-weight:800;font-size:13px;transition:transform .13s ease,background .13s ease,border-color .13s ease,color .13s ease,box-shadow .13s ease}
+.chip:hover{transform:translateY(-1px);border-color:#ded6d1;background:var(--surface-soft)}
+.chip:active{transform:translateY(0) scale(.985)}
+.chip.active{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:0 5px 12px rgba(39,37,42,.09)}
+/* operation selector — four equal, clean controls */
+.chip-row[data-group=ops]{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;max-width:320px}
+.chip-multi{width:100%;height:52px;padding:0;border-radius:17px;background:#fffdfa;border-color:#e8e1dd;color:#686164;font-size:19px;font-weight:900;box-shadow:0 2px 0 rgba(70,55,50,.025);transition:transform .13s ease,background .13s ease,border-color .13s ease,color .13s ease,box-shadow .13s ease}
+.chip-multi:hover{background:#fffaf6;border-color:#dfd4ce;transform:translateY(-1px)}
+.chip-multi:active{transform:translateY(0) scale(.985)}
+.chip-multi.active{background:linear-gradient(180deg,#fff8f2,#fff1e9);border-color:#e6c9b9;color:#b77557;box-shadow:inset 0 0 0 1px rgba(223,147,111,.045),0 5px 12px rgba(223,147,111,.075)}
+.mixed-row{display:flex;align-items:center;gap:10px}
+.switch{position:relative;display:inline-block;width:46px;height:26px;flex:0 0 auto}
+.switch input{position:absolute;opacity:0;pointer-events:none}
+.slider{position:absolute;inset:0;background:#dfd9d6;border-radius:999px;cursor:pointer;transition:background .14s ease}
+.slider::before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.16);transition:transform .14s ease}
+.switch input:checked + .slider{background:var(--warm)}
+.switch input:checked + .slider::before{transform:translateX(20px)}
+.mixed-text{font-size:13px;color:var(--muted)}.mixed-text b{color:var(--ink)}
+.submit-btn{min-height:46px;padding:9px 20px;border:1px solid transparent;border-radius:999px;background:var(--ink);color:#fff;cursor:pointer;font-weight:900;font-size:14px;box-shadow:0 7px 16px rgba(39,37,42,.1);transition:transform .14s ease,box-shadow .14s ease,background .14s ease}
+.submit-btn:hover{transform:translateY(-1px);background:#343136;box-shadow:0 10px 18px rgba(39,37,42,.13)}
+.submit-btn:active{transform:translateY(0) scale(.985)}
+.start-btn{width:100%;min-height:52px;margin-top:16px;background:var(--warm);box-shadow:0 10px 20px rgba(223,147,111,.17)}
+.start-btn:hover{background:#d98662;box-shadow:0 12px 22px rgba(223,147,111,.2)}
+/* play */
+.play-header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:11px;color:var(--muted);font-size:12px}
+.play-header b{color:var(--ink)}
+#playTimer{font-family:'Nunito',sans-serif;font-weight:800;color:var(--warm-deep);letter-spacing:.02em}
+.progress-track{height:7px;border-radius:999px;background:#f0ece8;overflow:hidden;margin-bottom:18px}
+.progress-fill{height:100%;border-radius:999px;background:var(--warm);transition:width .22s ease}
+.problem-area{position:relative;min-height:255px;text-align:center;padding:30px 10px 14px}
+.expression{margin-bottom:21px;font-family:'Nunito','Zen Maru Gothic',sans-serif;font-size:clamp(38px,8vw,58px);font-weight:800;line-height:1.12;letter-spacing:-.045em}
+.factor-note{margin:0 0 14px;color:var(--muted);font-size:13px}
+.answer-form{display:flex;justify-content:center;gap:9px;flex-wrap:wrap}
+.answer-input,.num-input,.sign-btn{font-family:'Zen Maru Gothic',sans-serif;font-weight:700;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:var(--r-md);box-shadow:none;transition:border-color .13s ease,box-shadow .13s ease,transform .13s ease}
+.answer-input,.num-input{min-height:49px;padding:9px 10px;text-align:center}.answer-input{width:140px}.num-input{width:190px}
+.sign-btn{width:49px;cursor:pointer}.sign-btn:active{transform:scale(.98)}
+.answer-input:focus,.num-input:focus,.sign-btn:focus,.chip:focus,.submit-btn:focus,.mode-card:focus,.back-btn:focus,.quit-btn:focus,.kp-btn:focus{outline:none;border-color:#dfc0af;box-shadow:0 0 0 4px rgba(223,147,111,.10)}
+.stamp{position:absolute;top:-5px;left:50%;transform:translateX(-50%) scale(.4) rotate(-10deg);opacity:0;pointer-events:none;font-weight:900}
+.stamp.show{animation:stampIn .28s cubic-bezier(.18,.85,.2,1) forwards}
+@keyframes stampIn{0%{opacity:0;transform:translateX(-50%) scale(1.32) rotate(-7deg)}70%{opacity:1;transform:translateX(-50%) scale(1.015) rotate(-7deg)}100%{opacity:1;transform:translateX(-50%) scale(1) rotate(-7deg)}}
+.stamp-circle{width:74px;height:74px;border:6px solid var(--sage);border-radius:50%}.stamp-cross{font-size:60px;line-height:1;color:var(--danger)}.wrong-note{display:block;margin-top:2px;font-size:12px;font-weight:800;color:var(--danger);white-space:nowrap}
+.keypad{display:grid;grid-template-columns:repeat(3,56px);gap:8px;justify-content:center;margin-top:16px}
+.kp-btn{height:46px;border-radius:13px;border:1px solid var(--line);background:#fff;color:var(--ink);font-family:'Nunito','Zen Maru Gothic',sans-serif;font-weight:800;font-size:16px;cursor:pointer;transition:transform .10s ease,background .10s ease,box-shadow .10s ease,border-color .10s ease}
+.kp-btn:hover{transform:translateY(-1px);background:var(--surface-soft);box-shadow:0 5px 12px rgba(45,38,40,.06)}.kp-btn:active{transform:scale(.98)}.kp-clear{grid-column:span 3;height:40px;font-size:12px;color:var(--muted)}
+/* result */
+.result-wrap{text-align:center;padding:16px 4px 8px}.rank-badge{width:128px;height:128px;margin:8px auto 15px;border-radius:34px;display:flex;align-items:center;justify-content:center;border:6px solid var(--warm);transform:rotate(-4deg);font-family:'Nunito',sans-serif;font-weight:800;font-size:47px;box-shadow:0 16px 30px rgba(45,38,40,.07);animation:resultPop .4s cubic-bezier(.18,.85,.22,1) both}
+.rank-f{border-color:#9da0a5;color:#9da0a5}.rank-d{border-color:#8d9690;color:#7d8982}.rank-c{border-color:#7e9e8c;color:#648572}.rank-b{border-color:#6f9b84;color:#5f876f}.rank-a{border-color:#d1a15d;color:#b68743}.rank-s{border-color:#bf7e68;color:#ad6850}.rank-ss{border-color:#d86d77;color:#d86d77}.rank-ssr{border-color:transparent;color:#fff;background:linear-gradient(135deg,#dca27f,#9fbea9,#d6bd7a);background-size:180% 180%;text-shadow:0 1px 3px rgba(0,0,0,.16);animation:resultPop .4s cubic-bezier(.18,.85,.22,1) both,ssrShine 4.5s ease-in-out infinite}
+@keyframes ssrShine{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.result-comment{margin:0 0 16px;color:var(--muted);font-size:14px}.result-stats{display:flex;flex-direction:column;gap:7px;align-items:center;margin-bottom:20px;color:var(--muted);font-size:13px}.result-stats b{color:var(--ink);font-size:16px}.result-actions{display:flex;flex-direction:column;gap:9px;align-items:center}.result-actions .chip,.result-actions .submit-btn{width:220px}
+footer{display:flex;justify-content:center;gap:18px;margin-top:14px;color:var(--faint);font-family:'Nunito',sans-serif;font-size:9px;letter-spacing:.08em}
+@keyframes screenEnter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}@keyframes resultPop{0%{opacity:0;transform:rotate(-4deg) scale(.8)}65%{opacity:1;transform:rotate(-4deg) scale(1.035)}100%{transform:rotate(-4deg) scale(1)}}
+@media (max-width:640px){body{padding:0 12px 26px}.content{padding:21px 16px}.site-header{padding-top:7px}.hero-copy{padding-top:23px}.brand-tag{display:none}.mode-card{grid-template-columns:58px minmax(0,1fr);min-height:108px}.mode-card::after{right:16px}.chip-row[data-group=ops]{max-width:none}.chip-multi{height:48px}.result-stats div{width:100%;display:flex;justify-content:space-between;padding:10px 14px;background:var(--surface-soft);border:1px solid var(--line);border-radius:14px}.result-stats b{margin:0;font-size:16px}}
+@media (max-width:390px){.chip-row[data-group=ops]{grid-template-columns:repeat(2,minmax(0,1fr));max-width:220px}.chip-multi{height:46px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="site-header">
+    <div class="brandbar">
+      <div class="brand">
+        <img class="brand-logo-img" src="numora-logo-v2.svg" alt="NUMORA">
+        <div class="brand-copy"><strong>NUMORA</strong><span>NUMBERS CHALLENGE</span></div>
+      </div>
+      <div class="brand-tag">Think fast.</div>
+    </div>
+    <div class="hero-copy">
+      <p class="eyebrow">CALCULATE · BREAK DOWN · IMPROVE</p>
+      <h1>数字を、もっと気持ちよく。</h1>
+      <p>四則演算と素因数分解を、軽快なタイムチャレンジで。</p>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <div class="content">
+
+      <!-- ホーム -->
+      <section id="screen-home" class="screen active">
+        <button class="mode-card" data-mode="calc" type="button">
+          <div class="mode-glyph mode-glyph-calc" aria-hidden="true"><span>＋</span><span>−</span><span>×</span><span>÷</span></div>
+          <div class="mode-title">四則演算チャレンジ</div>
+          <p class="mode-desc">たし算・ひき算・かけ算・わり算を、時間内にどれだけ正確に解けるか。</p>
+        </button>
+        <button class="mode-card" data-mode="factor" type="button">
+          <div class="mode-glyph mode-glyph-factor" aria-hidden="true"><span>2</span><i>·</i><span>3</span><i>·</i><span>5</span></div>
+          <div class="mode-title">素因数分解チャレンジ</div>
+          <p class="mode-desc">出てきた数を、自分の手で素因数の掛け算に分解しよう。</p>
+        </button>
+      </section>
+
+      <!-- 設定 -->
+      <section id="screen-settings" class="screen">
+        <div class="settings-header">
+          <button class="back-btn" id="backToHome" type="button">← もどる</button>
+          <h2 id="settingsTitle">設定</h2>
+        </div>
+
+        <div class="field-row">
+          <span class="field-label">レベル</span>
+          <div class="chip-row" data-group="level">
+            <button class="chip" data-value="1" type="button">1</button>
+            <button class="chip" data-value="2" type="button">2</button>
+            <button class="chip active" data-value="3" type="button">3</button>
+            <button class="chip" data-value="4" type="button">4</button>
+            <button class="chip" data-value="5" type="button">5</button>
+          </div>
+        </div>
+
+        <div class="field-row calc-only" data-calc-only>
+          <span class="field-label">演算（複数選択可）</span>
+          <div class="chip-row" data-group="ops">
+            <button class="chip-multi active" data-value="add" type="button">＋</button>
+            <button class="chip-multi active" data-value="sub" type="button">－</button>
+            <button class="chip-multi active" data-value="mul" type="button">×</button>
+            <button class="chip-multi active" data-value="div" type="button">÷</button>
+          </div>
+        </div>
+
+        <div class="field-row calc-only mixed-row" data-calc-only>
+          <label class="switch">
+            <input type="checkbox" id="mixedToggle">
+            <span class="slider"></span>
+          </label>
+          <span class="mixed-text" id="mixedText">オフ：<b>正の数だけ</b>で出題</span>
+        </div>
+
+        <div class="field-row fixed-info-row">
+          <span class="field-label">このレベルの設定</span>
+          <div class="fixed-stats">
+            <span class="fixed-stat"><b id="fixedQuestionCount">20</b>問</span>
+            <span class="fixed-dot">·</span>
+            <span class="fixed-stat"><b id="fixedTimeLimit">50</b>秒</span>
+            <span class="fixed-note" id="fixedModeNote">レベルに応じて自動で決まります</span>
+          </div>
+        </div>
+
+        <button class="submit-btn start-btn" id="startBtn" type="button">はじめる</button>
+      </section>
+
+      <!-- プレイ -->
+      <section id="screen-play" class="screen">
+        <div class="play-header">
+          <span>問題 <b id="playProgress">1 / 20</b></span>
+          <span id="playTimer">残り 1:00</span>
+          <button class="quit-btn" id="quitBtn" type="button">やめる</button>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+        <div id="calc-play" class="mode-play">
+          <div class="problem-area">
+            <div class="stamp" id="calcStamp"></div>
+            <div class="expression" id="expression">7 + 5</div>
+            <form class="answer-form" id="answerForm">
+              <button type="button" class="sign-btn" id="signBtn" title="±を切り替え">±</button>
+              <input class="answer-input" id="answerInput" type="text" inputmode="numeric" autocomplete="off" placeholder="こたえ">
+              <button type="submit" class="submit-btn">こたえる</button>
+            </form>
+          </div>
+        </div>
+
+        <div id="factor-play" class="mode-play" style="display:none;">
+          <div class="problem-area">
+            <div class="stamp" id="factorStamp"></div>
+            <div class="expression" id="factorTarget">360</div>
+            <p class="factor-note">この数を素因数の掛け算で表そう</p>
+            <form class="answer-form" id="factorAnswerForm">
+              <input class="num-input" id="factorAnswerInput" type="text" autocomplete="off" placeholder="例：2×2×3×5">
+              <button type="submit" class="submit-btn">こたえる</button>
+            </form>
+            <div class="keypad" id="factorKeypad">
+              <button class="kp-btn" data-key="7" type="button">7</button>
+              <button class="kp-btn" data-key="8" type="button">8</button>
+              <button class="kp-btn" data-key="9" type="button">9</button>
+              <button class="kp-btn" data-key="4" type="button">4</button>
+              <button class="kp-btn" data-key="5" type="button">5</button>
+              <button class="kp-btn" data-key="6" type="button">6</button>
+              <button class="kp-btn" data-key="1" type="button">1</button>
+              <button class="kp-btn" data-key="2" type="button">2</button>
+              <button class="kp-btn" data-key="3" type="button">3</button>
+              <button class="kp-btn" data-key="×" type="button">×</button>
+              <button class="kp-btn" data-key="0" type="button">0</button>
+              <button class="kp-btn" data-key="back" type="button">⌫</button>
+              <button class="kp-btn kp-clear" data-key="clear" type="button">クリア</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 結果 -->
+      <section id="screen-result" class="screen">
+        <div class="result-wrap">
+          <div class="rank-badge" id="rankBadge"><span id="rankLabel">S</span></div>
+          <p class="result-comment" id="resultComment"></p>
+          <div class="result-stats">
+            <div>せいかい <b id="resultCorrect">0</b> / <b id="resultTotal">0</b> 問</div>
+            <div>かかった時間 <b id="resultTime">0:00.0</b></div>
+            <div>平均 <b id="resultAvg">0.0</b> 秒/問</div>
+          </div>
+          <div class="result-actions">
+            <button class="submit-btn" id="retryBtn" type="button">もういちど</button>
+            <button class="chip" id="changeSettingsBtn" type="button">設定を変える</button>
+            <button class="chip" id="homeBtn" type="button">スタートメニューへ</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer><span>NUMORA</span><span>Enterで回答</span></footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ================= 共通ユーティリティ =================
+  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+  function clamp(x, min, max){ return Math.min(max, Math.max(min, x)); }
+
+  function factorize(n){
+    const factors = [];
+    let num = n;
+    for(let p = 2; p * p <= num; p++){
+      while(num % p === 0){ factors.push(p); num /= p; }
+    }
+    if(num > 1) factors.push(num);
+    return factors;
+  }
+  function isPrime(n){ return n >= 2 && factorize(n).length === 1; }
+
+  function formatTime(sec){
+    const m = Math.floor(sec / 60);
+    const s = sec - m * 60;
+    return m + ':' + s.toFixed(1).padStart(4, '0');
+  }
+
+  // ================= レベル別プリセット =================
+  // 四則演算は難しくなるほど問題数を減らす。素因数分解はさらに問題数を絞り、時間も少し短めにする。
+  const LEVEL_PRESETS = {
+    1: { calcQuestions: 20, calcTime: 50, factorQuestions: 12, factorTime: 45 },
+    2: { calcQuestions: 18, calcTime: 45, factorQuestions: 10, factorTime: 40 },
+    3: { calcQuestions: 15, calcTime: 40, factorQuestions: 8,  factorTime: 35 },
+    4: { calcQuestions: 12, calcTime: 35, factorQuestions: 7,  factorTime: 30 },
+    5: { calcQuestions: 8,  calcTime: 30, factorQuestions: 6,  factorTime: 25 }
+  };
+
+  // ================= アプリの状態 =================
+  const settings = {
+    level: 3,
+    ops: { add:true, sub:true, mul:true, div:true },
+    mixed: false,
+    questionCount: 20,
+    timeLimit: 50 // レベルから自動決定
+  };
+
+  const app = {
+    mode: 'calc', // 'calc' | 'factor'
+    session: null // 進行中セッション
+  };
+
+  // ================= 画面切り替え =================
+  const screens = {
+    home: document.getElementById('screen-home'),
+    settings: document.getElementById('screen-settings'),
+    play: document.getElementById('screen-play'),
+    result: document.getElementById('screen-result')
+  };
+  function showScreen(name){
+    Object.values(screens).forEach(s => s.classList.remove('active'));
+    screens[name].classList.add('active');
+  }
+
+  // ================= ホーム =================
+  document.querySelectorAll('.mode-card').forEach(card => {
+    card.addEventListener('click', () => {
+      app.mode = card.dataset.mode;
+      openSettingsScreen();
+    });
+  });
+
+  // ================= 設定画面 =================
+  function openSettingsScreen(){
+    document.getElementById('settingsTitle').textContent =
+      app.mode === 'calc' ? '四則演算チャレンジ の設定' : '素因数分解チャレンジ の設定';
+    document.querySelectorAll('[data-calc-only]').forEach(el => {
+      el.style.display = app.mode === 'calc' ? '' : 'none';
+    });
+    applyLevelPreset();
+    showScreen('settings');
+  }
+
+  document.getElementById('backToHome').addEventListener('click', () => showScreen('home'));
+
+  function applyLevelPreset(){
+    const preset = LEVEL_PRESETS[settings.level] || LEVEL_PRESETS[3];
+    const factor = app.mode === 'factor';
+    settings.questionCount = factor ? preset.factorQuestions : preset.calcQuestions;
+    settings.timeLimit = factor ? preset.factorTime : preset.calcTime;
+    const q = document.getElementById('fixedQuestionCount');
+    const t = document.getElementById('fixedTimeLimit');
+    const note = document.getElementById('fixedModeNote');
+    if(q) q.textContent = settings.questionCount;
+    if(t) t.textContent = settings.timeLimit;
+    if(note) note.textContent = factor ? '少なめの問題数に合わせて時間も調整' : 'レベルに応じて自動で決まります';
+  }
+
+  document.querySelectorAll('.chip-row').forEach(row => {
+    row.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if(!btn) return;
+      const group = row.dataset.group;
+
+      if(group === 'ops'){
+        const key = btn.dataset.value;
+        const activeCount = Object.values(settings.ops).filter(Boolean).length;
+        if(settings.ops[key] && activeCount === 1) return; // 最低ひとつは残す
+        settings.ops[key] = !settings.ops[key];
+        btn.classList.toggle('active', settings.ops[key]);
+        return;
+      }
+
+      // 単一選択グループ
+      row.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const raw = btn.dataset.value;
+      if(group === 'level'){
+        settings.level = Number(raw);
+        applyLevelPreset();
+      }
+    });
+  });
+
+  document.getElementById('mixedToggle').addEventListener('change', (e) => {
+    settings.mixed = e.target.checked;
+    document.getElementById('mixedText').innerHTML = settings.mixed
+      ? 'オン：<b>負の数もまざる</b>'
+      : 'オフ：<b>正の数だけ</b>で出題';
+  });
+
+  document.getElementById('startBtn').addEventListener('click', startSession);
+
+  // ================= 四則演算：問題生成 =================
+  function levelConfigCalc(level){
+    const cfg = {
+      1: { addMax:9,   mulA:9,  mulB:9,  divQ:9,  divD:9  },
+      2: { addMax:20,  mulA:12, mulB:9,  divQ:9,  divD:12 },
+      3: { addMax:100, mulA:20, mulB:12, divQ:20, divD:12 },
+      4: { addMax:500, mulA:50, mulB:20, divQ:50, divD:20 },
+      5: { addMax:1000,mulA:99, mulB:50, divQ:99, divD:50 }
+    };
+    return cfg[level];
+  }
+  function applySign(n){
+    if(settings.mixed && Math.random() < 0.45) return -n;
+    return n;
+  }
+  const OP_SYMBOL = { add:'+', sub:'−', mul:'×', div:'÷' };
+  function fmt(n){ return n < 0 ? '(' + n + ')' : String(n); }
+
+  function generateCalcProblem(){
+    const enabled = Object.keys(settings.ops).filter(k => settings.ops[k]);
+    const opList = enabled.length ? enabled : ['add','sub','mul','div'];
+    const cfg = levelConfigCalc(settings.level);
+
+    // 同じステージ（＝同じプレイセッション）では同一問題を出さない
+    for(let attempt = 0; attempt < 100; attempt++){
+      const op = opList[randInt(0, opList.length - 1)];
+      let a, b, answer;
+
+      if(op === 'add'){
+        a = randInt(1, cfg.addMax); b = randInt(1, cfg.addMax);
+        a = applySign(a); b = applySign(b);
+        answer = a + b;
+      } else if(op === 'sub'){
+        a = randInt(1, cfg.addMax); b = randInt(1, cfg.addMax);
+        if(!settings.mixed){
+          if(b > a){ const t = a; a = b; b = t; }
+        } else {
+          a = applySign(a); b = applySign(b);
+        }
+        answer = a - b;
+      } else if(op === 'mul'){
+        a = randInt(1, cfg.mulA); b = randInt(1, cfg.mulB);
+        a = applySign(a); b = applySign(b);
+        answer = a * b;
+      } else {
+        const divisorMin = settings.level === 1 ? 1 : 2;
+        const quotientMin = settings.level === 1 ? 1 : 2;
+        const divisor = randInt(divisorMin, cfg.divD);
+        const quotient = randInt(quotientMin, cfg.divQ);
+        if(settings.mixed){
+          const signD = Math.random() < 0.45 ? -1 : 1;
+          const signQ = Math.random() < 0.45 ? -1 : 1;
+          const d = divisor * signD;
+          const q = quotient * signQ;
+          a = d * q; b = d; answer = q;
+        } else {
+          a = divisor * quotient; b = divisor; answer = quotient;
+        }
+      }
+
+      // 交換可能な演算も同じ式として扱う（例: 2+3 と 3+2）
+      const keyA = (op === 'add' || op === 'mul') ? Math.min(a,b) : a;
+      const keyB = (op === 'add' || op === 'mul') ? Math.max(a,b) : b;
+      const key = `calc:${op}:${keyA}:${keyB}`;
+      if(!app.session.usedProblems.has(key)){
+        app.session.usedProblems.add(key);
+        return { op, a, b, answer };
+      }
+    }
+
+    // 生成空間が狭いレベルでも進行不能にはしない
+    const fallback = generateCalcProblemFallback();
+    return fallback;
+  }
+
+  function generateCalcProblemFallback(){
+    const enabled = Object.keys(settings.ops).filter(k => settings.ops[k]);
+    const op = enabled[0] || 'add';
+    const cfg = levelConfigCalc(settings.level);
+    let a = 1, b = 1, answer = 2;
+    if(op === 'add'){ a = 1; b = 1; answer = 2; }
+    else if(op === 'sub'){ a = 2; b = 1; answer = 1; }
+    else if(op === 'mul'){ a = 1; b = 2; answer = 2; }
+    else { a = 2; b = 1; answer = 2; }
+    return { op, a, b, answer };
+  }
+
+  // ================= 素因数分解：問題生成 =================
+  function factorRangeForLevel(level){
+    const ranges = { 1:[4,40], 2:[20,150], 3:[100,800], 4:[500,5000], 5:[3000,50000] };
+    return ranges[level];
+  }
+  function generateFactorProblem(){
+    const [min, max] = factorRangeForLevel(settings.level);
+    for(let attempt = 0; attempt < 100; attempt++){
+      const n = randInt(min, max);
+      if(isPrime(n) && Math.random() < 0.5) continue;
+      const key = `factor:${n}`;
+      if(app.session.usedProblems.has(key)) continue;
+      app.session.usedProblems.add(key);
+      return { n, factors: factorize(n) };
+    }
+
+    // 念のため、生成範囲を走査して未使用の値を探す
+    for(let n = min; n <= max; n++){
+      const key = `factor:${n}`;
+      if(!isPrime(n) && !app.session.usedProblems.has(key)){
+        app.session.usedProblems.add(key);
+        return { n, factors: factorize(n) };
+      }
+    }
+    return { n: min, factors: factorize(min) };
+  }
+  function checkFactorAnswer(raw, n){
+    const parts = raw.split(/[^0-9]+/).filter(s => s.length > 0).map(Number);
+    if(parts.length === 0) return { valid:false, correct:false };
+    const allPrime = parts.every(p => p >= 2 && isPrime(p));
+    const product = parts.reduce((acc, p) => acc * p, 1);
+    const correct = allPrime && product === n;
+    return { valid:true, correct, parts };
+  }
+  function toSuperscript(n){
+    const map = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+    return String(n).split('').map(d => map[d] || d).join('');
+  }
+  function factorsToDisplay(factors){
+    const counts = {};
+    factors.forEach(f => { counts[f] = (counts[f] || 0) + 1; });
+    return Object.keys(counts).map(p => {
+      const exp = counts[p];
+      return exp > 1 ? p + toSuperscript(exp) : String(p);
+    }).join(' × ');
+  }
+
+  // ================= セッション制御 =================
+  const calcPlay = document.getElementById('calc-play');
+  const factorPlay = document.getElementById('factor-play');
+  const answerInput = document.getElementById('answerInput');
+  const factorAnswerInput = document.getElementById('factorAnswerInput');
+
+  function startSession(){
+    app.session = {
+      index: 0,
+      correct: 0,
+      startTime: performance.now(),
+      timerId: null,
+      advanceTimeoutId: null,
+      current: null,
+      ended: false,
+      usedProblems: new Set()
+    };
+    calcPlay.style.display = app.mode === 'calc' ? '' : 'none';
+    factorPlay.style.display = app.mode === 'factor' ? '' : 'none';
+    showScreen('play');
+    startTimerInterval();
+    nextQuestion();
+  }
+
+  function getEffectiveTimeLimit(){
+    if(settings.timeLimit === null) return null;
+    return app.mode === 'factor' ? settings.timeLimit * 2 : settings.timeLimit;
+  }
+
+  function startTimerInterval(){
+    updateTimerDisplay();
+    app.session.timerId = setInterval(() => {
+      const elapsedSec = (performance.now() - app.session.startTime) / 1000;
+      const limit = getEffectiveTimeLimit();
+      if(limit !== null && elapsedSec >= limit){
+        finalizeSession('timeup');
+        return;
+      }
+      updateTimerDisplay();
+    }, 250);
+  }
+
+  function updateTimerDisplay(){
+    const elapsedSec = (performance.now() - app.session.startTime) / 1000;
+    const el = document.getElementById('playTimer');
+    const limit = getEffectiveTimeLimit();
+    if(limit !== null){
+      const remaining = Math.max(0, Math.ceil(limit - elapsedSec));
+      el.textContent = '残り ' + Math.floor(remaining / 60) + ':' + String(remaining % 60).padStart(2, '0');
+    } else {
+      const elapsed = Math.floor(elapsedSec);
+      el.textContent = '経過 ' + Math.floor(elapsed / 60) + ':' + String(elapsed % 60).padStart(2, '0');
+    }
+  }
+
+  function nextQuestion(){
+    if(app.session.index >= settings.questionCount){
+      finalizeSession('done');
+      return;
+    }
+    document.getElementById('playProgress').textContent =
+      (app.session.index + 1) + ' / ' + settings.questionCount;
+    document.getElementById('progressFill').style.width =
+      Math.round((app.session.index / settings.questionCount) * 100) + '%';
+
+    if(app.mode === 'calc'){
+      app.session.current = generateCalcProblem();
+      const expressionEl = document.getElementById('expression');
+      expressionEl.textContent = fmt(app.session.current.a) + ' ' + OP_SYMBOL[app.session.current.op] + ' ' + fmt(app.session.current.b) + ' =';
+      expressionEl.style.opacity = '0';
+      expressionEl.style.transform = 'translateY(7px) scale(.985)';
+      requestAnimationFrame(() => {
+        expressionEl.style.opacity = '1';
+        expressionEl.style.transform = 'none';
+      });
+      const stamp = document.getElementById('calcStamp');
+      stamp.className = 'stamp'; stamp.innerHTML = '';
+      answerInput.value = '';
+      answerInput.disabled = false;
+      answerInput.focus();
+    } else {
+      app.session.current = generateFactorProblem();
+      const factorTargetEl = document.getElementById('factorTarget');
+      factorTargetEl.textContent = String(app.session.current.n);
+      factorTargetEl.style.opacity = '0';
+      factorTargetEl.style.transform = 'translateY(7px) scale(.985)';
+      requestAnimationFrame(() => {
+        factorTargetEl.style.opacity = '1';
+        factorTargetEl.style.transform = 'none';
+      });
+      const stamp = document.getElementById('factorStamp');
+      stamp.className = 'stamp'; stamp.innerHTML = '';
+      factorAnswerInput.value = '';
+      factorAnswerInput.disabled = false;
+      factorAnswerInput.focus();
+    }
+  }
+
+  function advanceAfterAnswer(delay){
+    app.session.advanceTimeoutId = setTimeout(() => {
+      app.session.index += 1;
+      nextQuestion();
+    }, delay);
+  }
+
+  // 四則演算：回答
+  document.getElementById('answerForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if(!app.session || app.session.ended || answerInput.disabled) return;
+    const raw = answerInput.value.trim();
+    if(raw === '' || raw === '-') return;
+    const userAnswer = Number(raw);
+    if(Number.isNaN(userAnswer)) return;
+
+    const correct = userAnswer === app.session.current.answer;
+    if(correct) app.session.correct += 1;
+
+    const stamp = document.getElementById('calcStamp');
+    if(correct){
+      stamp.innerHTML = '<div class="stamp-circle"></div>';
+    } else {
+      stamp.innerHTML = '<div class="stamp-cross">✕</div><span class="wrong-note">正解：' + app.session.current.answer + '</span>';
+    }
+    stamp.className = 'stamp show';
+    answerInput.disabled = true;
+    advanceAfterAnswer(correct ? 800 : 1500);
+  });
+
+  document.getElementById('signBtn').addEventListener('click', () => {
+    if(answerInput.value.startsWith('-')) answerInput.value = answerInput.value.slice(1);
+    else if(answerInput.value.length) answerInput.value = '-' + answerInput.value;
+    else answerInput.value = '-';
+    answerInput.focus();
+  });
+
+  // 素因数分解：回答
+  document.getElementById('factorAnswerForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if(!app.session || app.session.ended || factorAnswerInput.disabled) return;
+    const raw = factorAnswerInput.value.trim();
+    if(raw === '') return;
+    const result = checkFactorAnswer(raw, app.session.current.n);
+    if(!result.valid) return;
+
+    if(result.correct) app.session.correct += 1;
+
+    const stamp = document.getElementById('factorStamp');
+    if(result.correct){
+      stamp.innerHTML = '<div class="stamp-circle"></div>';
+    } else {
+      const answerText = app.session.current.n + ' = ' + factorsToDisplay(app.session.current.factors);
+      stamp.innerHTML = '<div class="stamp-cross">✕</div><span class="wrong-note">正解：' + answerText + '</span>';
+    }
+    stamp.className = 'stamp show';
+    factorAnswerInput.disabled = true;
+    advanceAfterAnswer(result.correct ? 900 : 2200);
+  });
+
+  // 素因数分解：テンキー
+  document.getElementById('factorKeypad').addEventListener('click', (e) => {
+    const btn = e.target.closest('.kp-btn');
+    if(!btn || factorAnswerInput.disabled) return;
+    const key = btn.dataset.key;
+    if(key === 'back') factorAnswerInput.value = factorAnswerInput.value.slice(0, -1);
+    else if(key === 'clear') factorAnswerInput.value = '';
+    else factorAnswerInput.value += key;
+    factorAnswerInput.focus();
+  });
+
+  // やめる
+  document.getElementById('quitBtn').addEventListener('click', () => {
+    clearTimersAndTimeouts();
+    openSettingsScreen();
+  });
+
+  function clearTimersAndTimeouts(){
+    if(app.session){
+      clearInterval(app.session.timerId);
+      clearTimeout(app.session.advanceTimeoutId);
+      app.session.ended = true;
+    }
+  }
+
+  // ================= ランク判定 =================
+  const RANKS = [
+    { min:95, label:'SSR', cls:'rank-ssr', comment:'完璧！文句なしの一手だね。' },
+    { min:85, label:'SS',  cls:'rank-ss',  comment:'すごい正確さとスピード！' },
+    { min:72, label:'S',   cls:'rank-s',   comment:'なかなかの実力だね。' },
+    { min:58, label:'A',   cls:'rank-a',   comment:'安定してきたね、この調子で。' },
+    { min:44, label:'B',   cls:'rank-b',   comment:'基本はできてる、あと一歩。' },
+    { min:28, label:'C',   cls:'rank-c',   comment:'まずは正確さを意識してみよう。' },
+    { min:14, label:'D',   cls:'rank-d',   comment:'ゆっくりでも、ミスを減らそう。' },
+    { min:0,  label:'F',   cls:'rank-f',   comment:'つぎはもう少し落ち着いて挑戦しよう。' }
+  ];
+  function computeRank(correct, total, elapsedSec, level, mode){
+    const baselineMap = mode === 'calc'
+      ? {1:5, 2:6, 3:8, 4:10, 5:12}
+      : {1:8, 2:12, 3:18, 4:25, 5:35};
+    const baselineTotal = baselineMap[level] * total;
+    const timeRatio = clamp(baselineTotal / Math.max(elapsedSec, 0.01), 0, 2);
+    const accuracy = total > 0 ? correct / total : 0;
+    const score = accuracy * (70 + 15 * timeRatio); // 正解率0なら常に0点
+    for(const r of RANKS){ if(score >= r.min) return r; }
+    return RANKS[RANKS.length - 1];
+  }
+
+  function finalizeSession(reason){
+    if(!app.session || app.session.ended) return;
+    clearTimersAndTimeouts();
+    const total = settings.questionCount;
+    const correct = app.session.correct;
+    const elapsedSec = reason === 'timeup'
+      ? getEffectiveTimeLimit()
+      : (performance.now() - app.session.startTime) / 1000;
+
+    const rank = computeRank(correct, total, elapsedSec, settings.level, app.mode);
+
+    const badge = document.getElementById('rankBadge');
+    badge.className = 'rank-badge ' + rank.cls;
+    document.getElementById('rankLabel').textContent = rank.label;
+    document.getElementById('resultComment').textContent = rank.comment;
+    document.getElementById('resultCorrect').textContent = correct;
+    document.getElementById('resultTotal').textContent = total;
+    document.getElementById('resultTime').textContent = formatTime(elapsedSec);
+    document.getElementById('resultAvg').textContent = (elapsedSec / total).toFixed(1);
+
+    showScreen('result');
+  }
+
+  document.getElementById('retryBtn').addEventListener('click', startSession);
+  document.getElementById('changeSettingsBtn').addEventListener('click', openSettingsScreen);
+  document.getElementById('homeBtn').addEventListener('click', () => showScreen('home'));
+
+  // ================= デザイン演出 =================
+  const feedbackTargets = [answerInput, factorAnswerInput];
+  function animateFeedback(el, ok){
+    if(!el) return;
+    el.classList.remove('pulse-success','pulse-error');
+    void el.offsetWidth;
+    el.classList.add(ok ? 'pulse-success' : 'pulse-error');
+    setTimeout(() => el.classList.remove('pulse-success','pulse-error'), 480);
+  }
+
+  // 既存の回答処理を壊さず、入力欄だけに軽い状態アニメーションを付与
+  const originalAnswerHandler = document.getElementById('answerForm').onsubmit;
+  document.getElementById('answerInput').addEventListener('input', () => {
+    document.getElementById('answerInput').classList.remove('pulse-success','pulse-error');
+  });
+  document.getElementById('factorAnswerInput').addEventListener('input', () => {
+    document.getElementById('factorAnswerInput').classList.remove('pulse-success','pulse-error');
+  });
+
+  // ボタンの押下感を統一
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('pointerdown', () => {
+      btn.style.setProperty('--press-scale', '.985');
+    });
+    btn.addEventListener('pointerup', () => btn.style.removeProperty('--press-scale'));
+    btn.addEventListener('pointercancel', () => btn.style.removeProperty('--press-scale'));
+  });
+
+})();
+</script>
+</body>
+</html>
